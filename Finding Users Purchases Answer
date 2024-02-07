@@ -1,0 +1,22 @@
+# Import your libraries
+import pandas as pd
+
+# Start writing code
+amazon_transactions.head()
+
+# Convert purchase_date column to datetime
+amazon_transactions['created_at'] = pd.to_datetime(amazon_transactions['created_at'])
+
+# Sort DataFrame by user_id and purchase_date
+amazon_transactions.sort_values(['user_id', 'created_at'], inplace=True)
+
+# Calculate time difference between consecutive purchases for each user
+amazon_transactions['time_diff'] = amazon_transactions.groupby('user_id')['created_at'].diff()
+# Identify returning active users (second purchase within 7 days of any other purchase)
+returning_active_users = amazon_transactions[(amazon_transactions['time_diff'] <= pd.Timedelta(days=7)) & (amazon_transactions['time_diff'].notnull())]
+
+returning_active_user_ids = returning_active_users['user_id'].tolist()
+returning_active_user_ids = list(set(returning_active_users['user_id']))
+returning_active_user_ids = pd.DataFrame(returning_active_user_ids)
+returning_active_user_ids
+
